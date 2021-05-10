@@ -56,3 +56,4 @@ async def on_message(message):
                 wtc("[NOTIFICATION] This gift was already redeemed.")
             if 'subscription_plan' in r:
                 ptc("[SUCCESS] Nitro successfully claimed!")
+client.run(TOKEN, bot=False)
