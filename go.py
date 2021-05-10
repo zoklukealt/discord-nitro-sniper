@@ -1,5 +1,8 @@
 import os
 import discord
+import requests
+import re
+import json
 
 with open('config.json') as f:
 
@@ -23,7 +26,7 @@ class bcolors:
 def wtc(text):
   print(f"{bcolors.Warning}{text}")
 def ptc(text):
-  print(f"{bcolors.Blue}{text}")
+  print(f"{bcolors.Green}{text}")
 
 if os.name == 'nt':
   def clear():
@@ -34,4 +37,22 @@ else:
     
 client = commands.Bot(command_prefix='>', self_bot=True)
 
-print("
+@client.event()
+async def on_message(message):
+    if 'discord.gift/' in message.content or 'discord.com/gifts/' in message.content or 'discordapp.com/gifts/' in message.content:
+            if "discord.gift/" in message.content:
+                code = re.findall("discord[.]gift/(\w+)", message.content)
+            if "discordapp.com/gifts/" in message.content:
+                code = re.findall("discordapp[.]com/gifts/(\w+)", message.content)
+            if 'discord.com/gifts/' in message.content:
+                code = re.findall("discord[.]com/gifts/(\w+)", message.content)
+        wtc(f"[NOTIFICATION] Nitro code was posted. From: {message.authour}. Full message: {message.content}. Currently checking...")
+            headers = {'Authorization': token}
+            r = requests.post(
+                f'https://discordapp.com/api/v6/entitlements/gift-codes/{code}/redeem',
+                headers=headers,
+            ).text
+            if 'This gift has been redeemed already.' in r:
+                wtc("[NOTIFICATION] This gift was already redeemed.")
+            if 'subscription_plan' in r:
+                ptc("[SUCCESS] Nitro successfully claimed!")
